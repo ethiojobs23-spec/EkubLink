@@ -5,6 +5,8 @@ import { ArrowLeft, Coins, Clock, CheckCircle2, Trophy } from 'lucide-react'
 import { formatCurrency, formatDate, frequencyLabel } from '@/lib/utils'
 import { EkubGroup } from '@/lib/types'
 
+export const dynamic = 'force-dynamic';
+
 export default async function GroupsPage() {
   const supabase = await createClient()
 

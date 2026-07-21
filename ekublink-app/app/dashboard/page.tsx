@@ -8,6 +8,8 @@ import {
 import { formatCurrency, formatDate, groupStatusLabel } from '@/lib/utils'
 import { EkubGroup } from '@/lib/types'
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 

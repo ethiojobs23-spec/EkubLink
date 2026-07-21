@@ -4,6 +4,8 @@ import { ArrowLeft, User, Phone, CreditCard, Settings, LogOut } from 'lucide-rea
 import Link from 'next/link'
 import ProfileForm from './ProfileForm'
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
   const supabase = await createClient()
 
