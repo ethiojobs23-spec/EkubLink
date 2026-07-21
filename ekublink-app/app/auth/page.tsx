@@ -42,8 +42,7 @@ export default function AuthPage() {
     if (error) {
       setError(error.message)
     } else {
-      router.push('/dashboard')
-      router.refresh()
+      window.location.href = '/dashboard'
     }
     setLoading(false)
   }
@@ -80,8 +79,7 @@ export default function AuthPage() {
         .eq('id', data.user.id)
     }
 
-    router.push('/dashboard')
-    router.refresh()
+    window.location.href = '/dashboard'
     setLoading(false)
   }
 

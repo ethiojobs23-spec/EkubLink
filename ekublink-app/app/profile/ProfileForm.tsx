@@ -30,7 +30,7 @@ export default function ProfileForm({ profile, userId }: { profile: Profile | nu
     await supabase.from('profiles').update(form).eq('id', userId)
     setSaved(true)
     setLoading(false)
-    router.refresh()
+    window.location.reload()
   }
 
   const handleSignOut = async () => {
