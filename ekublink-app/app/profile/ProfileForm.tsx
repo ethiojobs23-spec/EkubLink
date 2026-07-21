@@ -16,9 +16,10 @@ export default function ProfileForm({ profile, userId }: { profile: Profile | nu
     phone_number: profile?.phone_number || '',
     cbe_account_number: profile?.cbe_account_number || '',
     cbe_account_name: profile?.cbe_account_name || '',
+    role: profile?.role || 'giver',
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
     setSaved(false)
   }
@@ -55,6 +56,17 @@ export default function ProfileForm({ profile, userId }: { profile: Profile | nu
               placeholder="+251 9XX XXX XXXX"
               className="input-field"
             />
+          </Field>
+          <Field label="Your Role">
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              className="input-field appearance-none cursor-pointer"
+            >
+              <option value="giver">Giver (Member)</option>
+              <option value="collector">Collector (Admin)</option>
+            </select>
           </Field>
         </div>
       </section>
