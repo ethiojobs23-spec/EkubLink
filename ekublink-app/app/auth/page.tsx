@@ -71,12 +71,16 @@ export default function AuthPage() {
       return
     }
 
-    // Update profile role (trigger creates row, but we need to set role)
+    // Update or insert profile role (fallback if trigger fails)
     if (data.user) {
       await supabase
         .from('profiles')
-        .update({ role: form.role, phone_number: form.phone, full_name: form.full_name })
-        .eq('id', data.user.id)
+        .upsert({ 
+          id: data.user.id,
+          role: form.role, 
+          phone_number: form.phone, 
+          full_name: form.full_name 
+        })
     }
 
     window.location.href = '/dashboard'

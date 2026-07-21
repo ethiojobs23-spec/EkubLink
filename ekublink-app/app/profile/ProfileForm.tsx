@@ -27,7 +27,7 @@ export default function ProfileForm({ profile, userId }: { profile: Profile | nu
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    await supabase.from('profiles').update(form).eq('id', userId)
+    await supabase.from('profiles').upsert({ id: userId, ...form })
     setSaved(true)
     setLoading(false)
     window.location.reload()
