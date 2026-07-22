@@ -15,7 +15,7 @@
 
 # production
 /ekublink-app/build
-
+/Abd
 # misc
 .DS_Store
 *.pem

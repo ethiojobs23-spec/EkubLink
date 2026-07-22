@@ -1,120 +1,56 @@
-# EkubLink — Digital Ethiopian Equb Web Application
+﻿# 🪙 EkubLink — Ethiopian Digital Ekub Platform
 
-A modern, mobile-first web application that digitizes the traditional Ethiopian **Equb** (Rotating Savings and Credit Association / ROSCA). Built with Next.js 14, TypeScript, Tailwind CSS, and Supabase.
+> A full-stack web application digitizing the traditional Ethiopian Ekub (rotating savings and credit association).
 
----
+## Project Structure
 
-## ✨ Features
-
-- **Two User Roles**: Collector (Admin) and Giver (Member)
-- **CBE Receipt Verification**: Upload screenshots with FT reference numbers; collectors verify in one tap
-- **Fraud Prevention**: Globally unique CBE transaction reference enforcement across all groups
-- **Animated Lottery Draw**: Digital spinning-wheel randomizer selects winners
-- **Transparency Board**: Real-time ledger showing payment statuses for all members
-- **Supabase Realtime**: Payment statuses update instantly without page reloads
-- **Mobile-First**: Optimized for touch interfaces with glassmorphism dark UI
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 14 (App Router) + TypeScript |
-| Styling | Tailwind CSS v4 + Lucide Icons |
-| Backend | Supabase (Postgres + Auth + Storage + Realtime) |
-| Auth | Email/Password via Supabase Auth |
-| Storage | Supabase Storage (CBE receipt images/PDFs) |
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone the repo
-```bash
-git clone https://github.com/ethiojobs23-spec/EkubLink.git
-cd EkubLink/ekublink-app
+```
+EkubLink/
+├── frontend/          # Vue 3 + Vite (deploy to Vercel)
+│   ├── src/
+│   │   ├── router/    # Vue Router with role guards
+│   │   ├── stores/    # Pinia state management
+│   │   ├── views/
+│   │   │   ├── auth/       # Login & Signup
+│   │   │   ├── collector/  # Collector-only pages
+│   │   │   └── giver/      # Giver-only pages
+│   │   ├── layouts/   # CollectorLayout, GiverLayout
+│   │   └── services/  # Axios API client
+│   └── vite.config.js
+│
+└── backend/           # Node.js + Express + Prisma
+    ├── prisma/
+    │   └── schema.prisma
+    └── src/
+        ├── server.js
+        ├── controllers/
+        ├── routes/
+        ├── middleware/
+        └── utils/
 ```
 
-### 2. Install dependencies
+## Quick Start
+
+### Backend
 ```bash
+cd backend
+cp .env.example .env  # Fill in DATABASE_URL and JWT_SECRET
 npm install
-```
-
-### 3. Set up Supabase
-1. Create a project at [supabase.com](https://supabase.com)
-2. Run `supabase/schema.sql` in the Supabase SQL Editor
-3. Create two storage buckets: `receipts` (private) and `avatars` (public)
-4. Copy your project URL and anon key
-
-### 4. Configure environment
-```bash
-cp .env.local.example .env.local
-# Edit .env.local with your Supabase credentials
-```
-
-### 5. Run development server
-```bash
+npx prisma migrate dev --name init
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
-
----
-
-## 📊 Database Schema
-
-```
-profiles          — User profiles (role, CBE account info)
-ekub_groups       — Ekub group configuration
-group_members     — Member-group join table with slot assignments  
-rounds            — Each savings cycle (status, winner, pool)
-transactions      — Payment records with CBE FT reference (UNIQUE)
+### Frontend
+```bash
+cd frontend
+cp .env.example .env.local
+npm install
+npm run dev
 ```
 
----
-
-## 🔐 Row Level Security
-
-All tables have RLS enabled:
-- Members can only see groups they belong to
-- Transactions are visible to the member and the collector
-- Only collectors can verify/reject transactions
-- Globally unique `transaction_reference` prevents duplicate receipt fraud
-
----
-
-## 📱 Pages
-
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page |
-| `/auth` | Sign In / Sign Up |
-| `/dashboard` | Role-aware home dashboard |
-| `/groups` | All user's Ekub groups |
-| `/groups/new` | Create new group (Collector) |
-| `/groups/[id]` | Group detail + transparency board |
-| `/groups/[id]/verify` | Receipt verification queue (Collector) |
-| `/groups/[id]/round/[roundId]/upload` | Upload payment receipt (Giver) |
-| `/groups/join` | Join with invite code |
-| `/profile` | User profile + CBE account settings |
-
----
-
-## 💡 Business Logic
-
-1. **Collector** creates an Ekub group with CBE account details
-2. **Givers** join via 8-character invite code
-3. Givers transfer via CBE Mobile/CBEBirr externally
-4. Givers upload CBE receipt + FT reference number in-app
-5. Collector reviews pending receipts and verifies each
-6. When 100% paid → lottery draw unlocks
-7. Animated wheel selects one winner (who hasn't won yet)
-8. Collector pays winner, uploads payout receipt
-9. Cycle repeats until all members have won exactly once
-
----
-
-## 📜 License
-
-MIT License — Built with ❤️ for Ethiopian savings communities.
+## Key Features
+- **Strict Role Separation**: COLLECTOR vs GIVER with Vue Router navigation guards
+- **CBE Payment Flow**: Receipt upload + manual CBE reference number verification
+- **Draw System**: Random or fixed-order lottery from approved-payment members
+- **JWT Authentication**: Secure token-based auth with role embedded in payload
+- **Prisma ORM**: Type-safe PostgreSQL queries with full relational schema

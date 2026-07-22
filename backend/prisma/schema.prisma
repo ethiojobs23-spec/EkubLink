@@ -1,0 +1,136 @@
+﻿// EkubLink - Ethiopian Digital Ekub
+// Prisma Schema for PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  COLLECTOR
+  GIVER
+}
+
+enum CycleFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum SelectionMethod {
+  RANDOM
+  FIXED_ORDER
+}
+
+enum GroupStatus {
+  RECRUITING
+  ACTIVE
+  COMPLETED
+}
+
+enum RoundStatus {
+  COLLECTING
+  DRAWN
+  PAID_OUT
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id            String   @id @default(uuid())
+  phone_number  String   @unique
+  full_name     String
+  role          UserRole
+  cbe_account   String?
+  password_hash String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  managed_groups    EkubGroup[]   @relation("CollectorGroups")
+  group_memberships GroupMember[]
+  won_rounds        Round[]       @relation("RoundWinners")
+  payments          Payment[]
+
+  @@map("users")
+}
+
+model EkubGroup {
+  id                  String          @id @default(uuid())
+  name                String
+  admin_id            String
+  contribution_amount Decimal         @db.Decimal(12, 2)
+  cycle_frequency     CycleFrequency
+  max_members         Int
+  start_date          DateTime
+  selection_method    SelectionMethod
+  bank_name           String          @default("CBE")
+  account_number      String
+  status              GroupStatus     @default(RECRUITING)
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+
+  admin   User          @relation("CollectorGroups", fields: [admin_id], references: [id])
+  members GroupMember[]
+  rounds  Round[]
+
+  @@map("ekub_groups")
+}
+
+model GroupMember {
+  id               String   @id @default(uuid())
+  group_id         String
+  user_id          String
+  has_won          Boolean  @default(false)
+  won_round_number Int?
+  fixed_order      Int?
+  joined_at        DateTime @default(now())
+
+  group EkubGroup @relation(fields: [group_id], references: [id])
+  user  User      @relation(fields: [user_id], references: [id])
+
+  @@unique([group_id, user_id])
+  @@map("group_members")
+}
+
+model Round {
+  id           String      @id @default(uuid())
+  group_id     String
+  round_number Int
+  due_date     DateTime
+  winner_id    String?
+  status       RoundStatus @default(COLLECTING)
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+
+  group    EkubGroup @relation(fields: [group_id], references: [id])
+  winner   User?     @relation("RoundWinners", fields: [winner_id], references: [id])
+  payments Payment[]
+
+  @@unique([group_id, round_number])
+  @@map("rounds")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  round_id          String
+  giver_id          String
+  receipt_image_url String?
+  cbe_ref_number    String?
+  status            PaymentStatus @default(PENDING)
+  submitted_at      DateTime      @default(now())
+  reviewed_at       DateTime?
+
+  round Round @relation(fields: [round_id], references: [id])
+  giver User  @relation(fields: [giver_id], references: [id])
+
+  @@unique([round_id, giver_id])
+  @@map("payments")
+}
